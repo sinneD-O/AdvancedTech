@@ -1,36 +1,27 @@
 import time
 from roslibpy import Ros, Topic, Message, Pose
 
-global client
+# 1. Verbindung zu TurtleBot
+# Je nachdem welcher Turtlebot ausgewählt ist, soll roslibpy eine Verbindung zu ihm aufbauen
+def connect_to_medibot(medibot="Medibot 1"):
+    client = Ros(host='localhost', port=8765)
+    if medibot == "Medibot 2":
+        client = Ros(host='localhost', port=9090)
+    if medibot == "Medibot 3":
+        client = Ros(host='localhost', port=9091)
+    return client
 
+client = connect_to_medibot()
+client.run()
 
 topic_goal_coordinates = Topic(client, '/goal_coordinates', 'geometry_msgs/PoseStamped')
 topic_robot_status = Topic(client, '/robot_status', 'std_msgs/String')
 topic_robot_position = Topic(client, '/robot_position', 'geometry_msgs/Pose')
 
-
-# 1. Verbindung zu TurtleBot
-# Mehrere Turtlebots kompatibel machen
-
-# Sollen mehrere Turtlebots gleichzeitig fahren?
-# Wenn ja, dann muss die Verbindung zu jedem Turtlebot einzeln aufgebaut werden
-# Wenn nein, kann die Verbindungen zu den Turtlebots über eine Verbindung aufgebaut werden
-
-# Feste IP-Adresse für Turtlebot erstellen
-# Verbindung zu Turtlebot aufbauen, wenn ausgewählt
-
-def connect_to_medibot(medibot):
-    if medibot == "Medibot 1":
-        client = Ros(host='localhost', port=8765)
-    elif medibot == "Medibot 2":
-        client = Ros(host='localhost', port=9090)
-    elif medibot == "Medibot 3":
-        client = Ros(host='localhost', port=9091)
-
-        client.run()
-
-
 # 2. Roboter soll beladen werden und bei “Submit” zum gewählten Ziel fahren
+# 4. Feedback: Turtlebot angekommen und abgeladen, soll wieder zurück zum Lager fahren
+# 5. Feedback: Fehlermeldung, falls möglich auch wieder zurück zum Lager
+# 2., 4. und 5.
 def move_to_goal(target_room):
     room1 = {
         'header': {

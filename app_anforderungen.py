@@ -1,15 +1,18 @@
 import time
 from roslibpy import Ros, Topic, Message, Pose
 
+
 # 1. Verbindung zu TurtleBot
 # Je nachdem welcher Turtlebot ausgewählt ist, soll roslibpy eine Verbindung zu ihm aufbauen
+# Funktioniert noch nicht so gut, muss verbessert werden nachdem es getestet wurde
 def connect_to_medibot(medibot="Medibot 1"):
-    client = Ros(host='localhost', port=8765)
+    select_client = Ros(host='localhost', port=8765)
     if medibot == "Medibot 2":
-        client = Ros(host='localhost', port=9090)
+        select_client = Ros(host='localhost', port=9090)
     if medibot == "Medibot 3":
-        client = Ros(host='localhost', port=9091)
-    return client
+        select_client = Ros(host='localhost', port=9091)
+    return select_client
+
 
 client = connect_to_medibot()
 client.run()
@@ -18,10 +21,13 @@ topic_goal_coordinates = Topic(client, '/goal_coordinates', 'geometry_msgs/PoseS
 topic_robot_status = Topic(client, '/robot_status', 'std_msgs/String')
 topic_robot_position = Topic(client, '/robot_position', 'geometry_msgs/Pose')
 
+
 # 2. Roboter soll beladen werden und bei “Submit” zum gewählten Ziel fahren
 # 4. Feedback: Turtlebot angekommen und abgeladen, soll wieder zurück zum Lager fahren
 # 5. Feedback: Fehlermeldung, falls möglich auch wieder zurück zum Lager
-# 2., 4. und 5.
+# 2., 4. und 5. können über diese Methode aufgerufen werden.
+# Für 2. Raum übergeben
+# Für 4. und 5. Lager übergeben
 def move_to_goal(target_room):
     room1 = {
         'header': {
@@ -121,13 +127,15 @@ def move_to_goal(target_room):
 
     if target_room == "Room 1":
         topic_goal_coordinates.publish(room1)
-    elif target_room == "Room 2":
+    if target_room == "Room 2":
         topic_goal_coordinates.publish(room2)
-    elif target_room == "Room 3":
+    if target_room == "Room 3":
         topic_goal_coordinates.publish(room3)
-    elif target_room == "Lager":
+    if target_room == "Lager":
         topic_goal_coordinates.publish(lager)
 
+
+# 6. Update der Position für die Karte
 def update_position(message):
     position = message['position']
     orientation = message['orientation']
@@ -136,11 +144,15 @@ def update_position(message):
           f"Position: z = {position['z']}\n"
           f"Orientation: w = {orientation['w']}")
 
-
+# 3. Feedback: Signal empfangen, dass der Turtlebot an Zielkoordinate angekommen ist
+# Welchen Status gibt es?
+# 1. "idle" 2. "delivering" 3. "goal reached"s
 def update_status(message):
     status = message['data']
     print(f"Status: {status}")
 
-# 3. Feedback: Signal empfangen, dass der Turtlebot an Zielkoordinate angekommen ist
+
+# Wenn eine Nachricht von dem ausgewählten Roboter geschickt wird, wird update_position aufgerufen
 topic_robot_position.subscribe(update_position)
+# Wenn eine Nachricht von dem ausgewählten Roboter geschickt wird, wird update_status aufgerufen
 topic_robot_status.subscribe(update_status)

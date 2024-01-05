@@ -1,4 +1,3 @@
-import time
 from roslibpy import Ros, Topic, Message, Pose
 
 
@@ -146,7 +145,7 @@ def update_position(message):
 
 # 3. Feedback: Signal empfangen, dass der Turtlebot an Zielkoordinate angekommen ist
 # Welchen Status gibt es?
-# 1. "idle" 2. "delivering" 3. "goal reached"s
+# 1. "idle" 2. "delivering" 3. "goal reached"
 def update_status(message):
     status = message['data']
     print(f"Status: {status}")

@@ -126,12 +126,32 @@ def move_to_goal(target_room):
 
     if target_room == "Room 1":
         topic_goal_coordinates.publish(room1)
+        message = {
+            'status': 'delivering',
+            'enum': 1
+        }
+        topic_robot_status.publish(message)
     if target_room == "Room 2":
         topic_goal_coordinates.publish(room2)
+        message = {
+            'status': 'delivering',
+            'enum': 1
+        }
+        topic_robot_status.publish(message)
     if target_room == "Room 3":
         topic_goal_coordinates.publish(room3)
+        message = {
+            'status': 'delivering',
+            'enum': 1
+        }
+        topic_robot_status.publish(message)
     if target_room == "Lager":
         topic_goal_coordinates.publish(lager)
+        message = {
+            'status': 'return to station',
+            'enum': 3
+        }
+        topic_robot_status.publish(message)
 
 
 # 6. Update der Position für die Karte
@@ -143,12 +163,18 @@ def update_position(message):
           f"Position: z = {position['z']}\n"
           f"Orientation: w = {orientation['w']}")
 
+
 # 3. Feedback: Signal empfangen, dass der Turtlebot an Zielkoordinate angekommen ist
 # Welchen Status gibt es?
-# 1. "idle" 2. "delivering" 3. "goal reached"
+# 1. "idle" 2. "delivering" 3. "goal reached" 4. "return to station"
 def update_status(message):
     status = message['data']
     print(f"Status: {status}")
+
+
+def close_connection():
+    client.terminate()
+    print()
 
 
 # Wenn eine Nachricht von dem ausgewählten Roboter geschickt wird, wird update_position aufgerufen
